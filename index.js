@@ -21,10 +21,12 @@ const bot = new Telebot({
 })
 
 bot.on('text', (msg) => {
-    const { text } = msg
-    console.log('foi')
-
-    bot.sendMessage(msg.chat.id, text)
+    const userId = msg.from.id
+    const name = msg.from.first_name
+    console.log(`${name}: ${userId}`)
+    fs.appendFile('./log.txt', `${name}: ${userId}\n`, 'utf8', (err) => {
+        if (err) throw err
+    })
 })
 
 bot.start()
