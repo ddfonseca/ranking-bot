@@ -1,9 +1,7 @@
-export const HOJE = new Date()
-export const HOJE_SQL = HOJE.toLocaleDateString('af-ZA', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-})
+import { ptBR } from 'date-fns/locale'
+import { format } from 'date-fns'
+import { getRankingBetween } from './supabase'
+import { subDays } from 'date-fns'
 
 export const createStringRank = (data) => {
     const result = data.reduce((acc, { minutos, players: { nome } }, idx) => {
@@ -22,4 +20,38 @@ export const createStringRank = (data) => {
         return acc
     }, '')
     return result
+}
+
+export const transformData = (data) => {
+    const result = []
+    data.reduce((acc, { players: { nome }, minutos }) => {
+        if (!acc[nome]) {
+            acc[nome] = { players: { nome }, minutos: 0 }
+            result.push(acc[nome])
+        }
+        acc[nome].minutos += minutos
+        return acc
+    }, {})
+    result.sort((a, b) => (a.minutos < b.minutos && 1) || -1)
+    return result
+}
+
+export const getRankingDiario = async () => {
+    const { data } = await getRankingBetween()
+    const sumData = transformData(data)
+    const hoje = formatDate(new Date(), 'PPPPp')
+    const header = `Ranking de ${hoje} 🏆\n\n`
+    return header + createStringRank(sumData)
+}
+
+export const getRankingAcumulativo = async () => {
+    const { data } = await getRankingBetween()
+    const sumData = transformData(data)
+    const hoje = formatDate(new Date(), 'PPPPp')
+    const header = `Ranking de ${hoje} 🏆\n\n`
+    return header + createStringRank(sumData)
+}
+
+export const formatDate = (date, pattern) => {
+    return format(date, pattern, { locale: ptBR })
 }

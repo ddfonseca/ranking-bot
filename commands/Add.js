@@ -1,9 +1,9 @@
+import { addRowRanking, updateRowRanking } from '../utils/supabase'
 import {
-    addRowRanking,
-    getRankingDiario,
-    updateRowRanking
-} from '../utils/supabase'
-import { createStringRank, HOJE, HOJE_SQL } from '../utils/helperFunctions'
+    createStringRank,
+    formatDate,
+    getRankingDiario
+} from '../utils/helperFunctions'
 import bot from '../utils/Bot'
 
 const AddCommand = () => {
@@ -18,31 +18,24 @@ const AddCommand = () => {
             const total = Number(horas) * 60 + Number(minutos)
             const name = msg.from.first_name
             const userId = msg.from.id
-            const hojePtbr = HOJE.toLocaleDateString('pt-br')
-            const { data, error } = await addRowRanking(userId, HOJE_SQL, total)
-            console.log('error', data, error)
+            const hojeSQL = formatDate(new Date(), 'yyyy-MM-dd')
+            const hojePtbr = formatDate(new Date(), 'PPPP')
+            const { data, error } = await addRowRanking(userId, hojeSQL, total)
+            // console.log('error', data, error)
             let resp = ''
             if (!error) {
                 resp = `${name}, ${horas} horas e ${minutos} minutos adicionados (Data: ${hojePtbr}).`
                 bot.sendMessage(msg.chat.id, resp)
-                bot.sendMessage(
-                    msg.chat.id,
-                    createStringRank(getRankingDiario())
-                )
+                bot.sendMessage(msg.chat.id, await getRankingDiario())
             } else if (error.details.includes('already')) {
                 resp = `Usuário já registrou o dia de hoje.\nAtualizando dados.`
                 bot.sendMessage(msg.chat.id, resp)
-                const { data, error } = await updateRowRanking(
-                    userId,
-                    HOJE_SQL,
-                    total
-                )
+                const { error } = await updateRowRanking(userId, hojeSQL, total)
                 if (!error) {
                     resp = `${name}, ${horas} horas e ${minutos} minutos atualizados. (Data: ${hojePtbr}).`
                     bot.sendMessage(msg.chat.id, resp)
-                    const { data } = await getRankingDiario()
-                    console.log(data)
-                    bot.sendMessage(msg.chat.id, createStringRank(data))
+
+                    bot.sendMessage(msg.chat.id, await getRankingDiario())
                 }
             }
         } else {

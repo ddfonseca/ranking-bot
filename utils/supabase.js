@@ -1,6 +1,6 @@
 import dotenv from 'dotenv'
 import { createClient } from '@supabase/supabase-js'
-import { createStringRank, HOJE, HOJE_SQL } from './helperFunctions'
+import { formatDate } from './helperFunctions'
 dotenv.config()
 
 const supabaseUrl = 'https://enoubxdmnbaakrbupthf.supabase.co'
@@ -35,40 +35,27 @@ export const updateRowRanking = async (userid, dia, minutos) => {
     return { data, error }
 }
 
-export const getRankingDiario = async () => {
-    const { data, error } = await supabase
-        .from('ranking')
-        .select('players ( nome) ,minutos')
-        .eq('dia', HOJE_SQL)
-        .order('minutos', { ascending: false })
-    return { data, error }
-}
-
-export const getRankingBetween = async (firstDate, lastDate) => {
+export const getRankingBetween = async (
+    firstDate = formatDate(new Date(), 'yyyy-MM-dd'),
+    lastDate = formatDate(new Date(), 'yyyy-MM-dd')
+) => {
     const { data, error } = await supabase
         .from('ranking')
         .select('userid, players ( nome) ,minutos')
         .gte('dia', firstDate)
         .lte('dia', lastDate)
         .order('minutos', { ascending: false })
+
     return { data, error }
 }
 
 const init = async () => {
-    const { data, error } = await getRankingBetween('2021-08-24', '2021-08-26')
-    console.log(data)
-    const result = data.reduce((acc, { players: { nome }, minutos }) => {
-        acc[]
-
-        console.log(acc)
-        return acc
-    }, [])
-    console.log('result:', result)
+    // const { data, error } = await getRankingBetween('2021-08-24', '2021-08-26')
+    // let result
     // if (!error) {
-    //     console.log(createStrin)
+    //     result = transFormData(data)
     // }
-    // const players = await getAllPlayers()
-    // const { ranking } = await console.log(players)
+    // console.log(result)
 }
 
 init()
