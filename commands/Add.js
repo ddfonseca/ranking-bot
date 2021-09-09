@@ -53,9 +53,9 @@ const getDate = () => {
     const minutes = getHours(today) * 3600 + getMinutes(today)
     const THRESHOLD = 9 * 3600
     if (minutes >= THRESHOLD) {
-        return new Date()
+        return today
     } else {
-        return subDays(new Date(), 1)
+        return subDays(today, 1)
     }
 }
 

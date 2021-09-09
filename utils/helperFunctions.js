@@ -1,6 +1,7 @@
 import { ptBR } from 'date-fns/locale'
-import { format, getDay, subDays } from 'date-fns'
+import { getDay, subDays } from 'date-fns'
 import { getRankingBetween } from './supabase'
+import { format } from 'date-fns-tz'
 
 export const createStringRank = (data) => {
     const result = data.reduce((acc, { minutos, players: { nome } }, idx) => {
@@ -68,7 +69,10 @@ export const getRankingAcumulativo = async () => {
 }
 
 export const formatDate = (date, pattern) => {
-    return format(date, pattern, { locale: ptBR })
+    return format(date, pattern, {
+        timeZone: 'America/Sao_Paulo',
+        locale: ptBR
+    })
 }
 
 export const getTimeAndReturnDay = () => {
