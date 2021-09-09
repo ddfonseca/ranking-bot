@@ -23,8 +23,5 @@
         "node-telegram-bot-api": "^0.54.0",
         "telebot": "^1.4.1",
         "telegraf": "^4.4.1"
-    },
-    "devDependencies": {
-        "netlify-cli": "^6.7.1"
     }
 }
