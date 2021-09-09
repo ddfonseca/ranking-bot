@@ -37,4 +37,4 @@ const getDateSQL = () => {
     }
 }
 
-init()
+// init()

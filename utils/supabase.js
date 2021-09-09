@@ -52,7 +52,7 @@ export const getRankingBetween = async (
 }
 
 const init = async () => {
-    console.log(await getRankingDiario(new Date()))
+    // console.log(await getRankingDiario(new Date()))
     // const { data, error } = await getRankingBetween('2021-08-24', '2021-08-26')
     // let result
     // if (!error) {
