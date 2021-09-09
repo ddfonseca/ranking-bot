@@ -1,7 +1,6 @@
 import { ptBR } from 'date-fns/locale'
-import { format } from 'date-fns'
+import { format, getDay, subDays } from 'date-fns'
 import { getRankingBetween } from './supabase'
-import { subDays } from 'date-fns'
 
 export const createStringRank = (data) => {
     const result = data.reduce((acc, { minutos, players: { nome } }, idx) => {
@@ -36,22 +35,42 @@ export const transformData = (data) => {
     return result
 }
 
-export const getRankingDiario = async () => {
-    const { data } = await getRankingBetween()
+export const getRankingDiario = async (date) => {
+    const { data } = await getRankingBetween(date, date)
     const sumData = transformData(data)
-    const hoje = formatDate(new Date(), 'PPPPp')
+    const hoje = formatDate(date, 'PPPPp')
     const header = `Ranking de ${hoje} 🏆\n\n`
     return header + createStringRank(sumData)
 }
 
 export const getRankingAcumulativo = async () => {
-    const { data } = await getRankingBetween()
-    const sumData = transformData(data)
-    const hoje = formatDate(new Date(), 'PPPPp')
-    const header = `Ranking de ${hoje} 🏆\n\n`
-    return header + createStringRank(sumData)
+    const weekday = getDay(new Date())
+    // se for segunda, fazer o ranking semanal
+
+    // se for dia 01, pegar o ranking mensal do mês anterior
+
+    // se for quarta-feira até domingo, realizar o
+    if (weekday > 2) {
+        const firstDay = subDays(new Date(), weekday - 1)
+        const lastDay = subDays(new Date(), weekday - 2)
+        console.log('first', firstDay)
+        console.log('last', lastDay)
+        const { data } = await getRankingBetween(firstDay, lastDay)
+        // console.log(data)
+        const firstDayFormatted = formatDate(firstDay, 'dd/MM/yyyy')
+        const lastDayFormatted = formatDate(lastDay, 'dd/MM/yyyy')
+        let header = `Ranking Acumulativo de ${weekday - 1} dias.\n`
+        header += `Entre as datas ${firstDayFormatted} e ${lastDayFormatted} 🏆\n\n`
+
+        const sumData = transformData(data)
+        return header + createStringRank(sumData)
+    }
 }
 
 export const formatDate = (date, pattern) => {
     return format(date, pattern, { locale: ptBR })
+}
+
+export const getTimeAndReturnDay = () => {
+    const today = new Date()
 }
