@@ -1,4 +1,5 @@
 import { addRowRanking, updateRowRanking } from '../utils/supabase'
+import { utcToZonedTime } from 'date-fns-tz'
 import {
     createStringRank,
     formatDate,
@@ -47,7 +48,8 @@ const AddCommand = () => {
 }
 
 const getDate = () => {
-    const today = new Date()
+    const today = utcToZonedTime(new Date(), 'America/Sao_Paulo')
+    console.log(today)
     const minutes = getHours(today) * 3600 + getMinutes(today)
     const THRESHOLD = 9 * 3600
     if (minutes >= THRESHOLD) {
@@ -56,5 +58,7 @@ const getDate = () => {
         return subDays(new Date(), 1)
     }
 }
+
+getDate()
 
 export default AddCommand
