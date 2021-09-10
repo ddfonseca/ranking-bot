@@ -7,6 +7,7 @@ import {
 } from '../utils/helperFunctions'
 import bot from '../utils/Bot'
 import { getHours, getMinutes } from 'date-fns'
+import subDays from 'date-fns/subDays'
 
 const AddCommand = () => {
     // bot.on(/\/add (\d{1,2})[:h](\d{0,2})/, async (msg ) => {
