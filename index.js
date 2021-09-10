@@ -1,6 +1,8 @@
 import express from 'express'
 import AddCommand from './commands/Add'
 import bot from './utils/Bot'
+import cron from 'node-cron'
+import { RankingsCommand } from './commands/Rankings'
 
 const app = express()
 app.set('port', process.env.PORT || 5000)
@@ -18,5 +20,9 @@ bot.on('text', (msg) => {
 })
 
 AddCommand()
+
+cron.schedule('1 9 * * *', () => {
+    RankingsCommand()
+})
 
 bot.start()

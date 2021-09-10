@@ -1,7 +1,14 @@
 import { ptBR } from 'date-fns/locale'
-import { getDay, subDays } from 'date-fns'
+import {
+    getDate,
+    getDay,
+    getDaysInMonth,
+    lastDayOfMonth,
+    subDays,
+    subMonths
+} from 'date-fns'
 import { getRankingBetween } from './supabase'
-import { format } from 'date-fns-tz'
+import { format, utcToZonedTime } from 'date-fns-tz'
 
 export const createStringRank = (data) => {
     const result = data.reduce((acc, { minutos, players: { nome } }, idx) => {
@@ -44,28 +51,44 @@ export const getRankingDiario = async (date) => {
     return header + createStringRank(sumData)
 }
 
-export const getRankingAcumulativo = async () => {
-    const weekday = getDay(new Date())
-    // se for segunda, fazer o ranking semanal
-
-    // se for dia 01, pegar o ranking mensal do mês anterior
-
-    // se for quarta-feira até domingo, realizar o
-    if (weekday > 2) {
-        const firstDay = subDays(new Date(), weekday - 1)
-        const lastDay = subDays(new Date(), weekday - 2)
-        console.log('first', firstDay)
-        console.log('last', lastDay)
-        const { data } = await getRankingBetween(firstDay, lastDay)
-        // console.log(data)
-        const firstDayFormatted = formatDate(firstDay, 'dd/MM/yyyy')
-        const lastDayFormatted = formatDate(lastDay, 'dd/MM/yyyy')
-        let header = `Ranking Acumulativo de ${weekday - 1} dias.\n`
-        header += `Entre as datas ${firstDayFormatted} e ${lastDayFormatted} 🏆\n\n`
-
-        const sumData = transformData(data)
-        return header + createStringRank(sumData)
+export const getRankingSemanal = async () => {
+    const today = utcToZonedTime(new Date(), 'America/Sao_Paulo')
+    const weekday = getDay(today)
+    if (weekday === 1) {
+        const firstDay = subDays(today, 7)
+        const lastDay = subDays(today, 1)
+        let header = `Ranking Semanal de 7 dias.\n`
+        return await parseDataFormatted(firstDay, lastDay, header)
     }
+}
+export const getRankingMensal = async () => {
+    const today = utcToZonedTime(new Date(), 'America/Sao_Paulo')
+    if (getDate(today) === 1) {
+        const firstDay = subMonths(today, 1)
+        const lastDay = lastDayOfMonth(firstDay)
+        let header = `Ranking Mensal de ${getDaysInMonth(firstDay)} dias.\n`
+        return await parseDataFormatted(firstDay, lastDay, header)
+    }
+}
+
+export const getRankingAcumulativo = async () => {
+    const today = utcToZonedTime(new Date(), 'America/Sao_Paulo')
+    const weekday = getDay(today)
+    if (weekday > 2) {
+        const firstDay = subDays(today, weekday - 1)
+        const lastDay = subDays(today, 1)
+        let header = `Ranking Acumulativo de ${weekday - 1} dias.\n`
+        return await parseDataFormatted(firstDay, lastDay, header)
+    }
+}
+
+const parseDataFormatted = async (firstDay, lastDay, header) => {
+    const firstDayFormatted = formatDate(firstDay, 'dd/MM/yyyy')
+    const lastDayFormatted = formatDate(lastDay, 'dd/MM/yyyy')
+    header += `Entre as datas ${firstDayFormatted} e ${lastDayFormatted} 🏆\n\n`
+    const { data } = await getRankingBetween(firstDay, lastDay)
+    const sumData = transformData(data)
+    return header + createStringRank(sumData)
 }
 
 export const formatDate = (date, pattern) => {
