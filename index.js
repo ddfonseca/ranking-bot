@@ -19,17 +19,21 @@ bot.on('text', (msg) => {
     console.log(`${name}: ${userId}`)
 })
 
+bot.on('/ranking', async () => {
+    await RankingsCommand()
+})
+
 AddCommand()
 
 const job = new CronJob(
     '1 9 * * *',
-    () => {
-        RankingsCommand()
+    async () => {
+        await RankingsCommand()
     },
     null,
     true,
     'America/Sao_Paulo'
 )
 
-job.start()
 bot.start()
+job.start()
