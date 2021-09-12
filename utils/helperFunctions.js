@@ -80,6 +80,12 @@ export const getRankingAcumulativo = async () => {
         let header = `Ranking Acumulativo de ${weekday - 1} dias.\n`
         return await parseDataFormatted(firstDay, lastDay, header)
     }
+    if (weekday === 0) {
+        const firstDay = subDays(today, 6)
+        const lastDay = subDays(today, 1)
+        let header = `Ranking Acumulativo de 6 dias.\n`
+        return await parseDataFormatted(firstDay, lastDay, header)
+    }
 }
 
 const parseDataFormatted = async (firstDay, lastDay, header) => {

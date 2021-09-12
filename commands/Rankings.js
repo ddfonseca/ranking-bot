@@ -11,14 +11,17 @@ const CHAT_ID = process.env.CHAT_ID
 
 export const RankingsCommand = async () => {
     let msg = await getRankingMensal()
+    console.log(`mensal: ${msg}\n`)
     if (msg) {
         bot.sendMessage(CHAT_ID, msg)
     }
     msg = await getRankingSemanal()
+    console.log(`semanal: ${msg}\n`)
     if (msg) {
         bot.sendMessage(CHAT_ID, msg)
     }
     msg = await getRankingAcumulativo()
+    console.log(`acumulativo: ${msg}\n`)
     if (msg) {
         bot.sendMessage(CHAT_ID, msg)
     }
