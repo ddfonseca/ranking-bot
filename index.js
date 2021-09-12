@@ -19,9 +19,7 @@ bot.on('text', (msg) => {
     console.log(`${name}: ${userId}`)
 })
 
-bot.on('/ranking', async () => {
-    await RankingsCommand()
-})
+bot.on('/ranking', RankingsCommand)
 
 AddCommand()
 
