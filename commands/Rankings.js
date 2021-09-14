@@ -7,7 +7,7 @@ import {
 } from '../utils/helperFunctions'
 dotenv.config()
 
-const CHAT_ID = process.env.CHAT_ID
+const CHAT_ID = -1001435149532
 
 export const RankingsCommand = async () => {
     let msg = await getRankingMensal()
