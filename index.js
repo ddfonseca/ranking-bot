@@ -1,6 +1,6 @@
 import express from 'express'
-import AddCommand from './commands/Add'
 import bot from './utils/Bot'
+import { AddCommand } from './commands/Add'
 import { RankingsCommand } from './commands/Rankings'
 import { CronJob } from 'cron'
 
@@ -19,15 +19,17 @@ bot.on('text', (msg) => {
     console.log(`${name}: ${userId}`)
 })
 
-bot.on('/ranking', async () => {
-    console.log('ranking trigged')
-    await RankingsCommand()
+bot.on('/ranking', (msg) => {
+    RankingsCommand(msg)
 })
 
-AddCommand()
+bot.on('/add', (msg) => {
+    AddCommand(msg)
+})
 
 const job = new CronJob(
-    '1 9 * * *',
+    // '1 9 * * *',
+    '58 18 * * *',
     async () => {
         await RankingsCommand()
     },

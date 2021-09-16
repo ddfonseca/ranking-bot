@@ -9,20 +9,24 @@ dotenv.config()
 
 const CHAT_ID = -1001435149532
 
-export const RankingsCommand = async () => {
-    let msg = await getRankingMensal()
-    console.log(`mensal: ${msg}\n`)
-    if (msg) {
-        bot.sendMessage(CHAT_ID, msg)
+export const RankingsCommand = async (msg) => {
+    let result = await getRankingMensal()
+    // console.log(`mensal: ${result}\n`)
+    const sendTo = msg ? msg.chat.id : CHAT_ID
+    if (result) {
+        bot.sendMessage(sendTo, result)
     }
-    msg = await getRankingSemanal()
-    console.log(`semanal: ${msg}\n`)
-    if (msg) {
-        bot.sendMessage(CHAT_ID, msg)
+    result = await getRankingSemanal()
+    // console.log(`semanal: ${result}\n`)
+    if (result) {
+        bot.sendMessage(sendTo, result)
     }
-    msg = await getRankingAcumulativo()
-    console.log(`acumulativo: ${msg}\n`)
-    if (msg) {
-        bot.sendMessage(CHAT_ID, msg)
+    result = await getRankingAcumulativo()
+    // console.log(`acumulativo: ${result}\n`)
+    if (result) {
+        bot.sendMessage(sendTo, result)
     }
+
+    // console.log(sendTo)
+    // console.log(result)
 }

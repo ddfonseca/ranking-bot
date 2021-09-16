@@ -1,56 +1,44 @@
 import { addRowRanking, updateRowRanking } from '../utils/supabase'
-import { utcToZonedTime } from 'date-fns-tz'
-import {
-    createStringRank,
-    formatDate,
-    getRankingDiario
-} from '../utils/helperFunctions'
+import { getRankingDiario } from '../utils/helperFunctions'
 import bot from '../utils/Bot'
+
+import { utcToZonedTime } from 'date-fns-tz'
 import { getHours, getMinutes } from 'date-fns'
 import subDays from 'date-fns/subDays'
 
-const AddCommand = () => {
-    // bot.on(/\/add (\d{1,2})[:h](\d{0,2})/, async (msg ) => {
-    bot.on('/add', async (msg) => {
-        // (\d{1,2})[:h](\d{0,2})
-        const re = /(\d{1,2})[:h](\d{0,2})/
-        const match = re.exec(msg.text) || false
-        if (match) {
-            const horas = match[1] || 0
-            const minutos = match[2] || 0
-            const total = Number(horas) * 60 + Number(minutos)
-            const name = msg.from.first_name
-            const userId = msg.from.id
-            const date = getDate()
-            const { data, error } = await addRowRanking(userId, date, total)
-            // console.log('error', data, error)
-            let resp = ''
+export const AddCommand = async (msg) => {
+    const re = /(\d{1,2})[:h](\d{0,2})/
+    const match = re.exec(msg.text) || false
+    if (match) {
+        const horas = match[1] || 0
+        const minutos = match[2] || 0
+        const total = Number(horas) * 60 + Number(minutos)
+        const userId = msg.from.id
+        const date = getDate()
+        const { data, error } = await addRowRanking(userId, date, total)
+        let resp = ''
+        if (!error) {
+            bot.sendMessage(msg.chat.id, await getRankingDiario(date))
+        } else if (error.details.includes('already')) {
+            resp = `Usuário já registrou o dia de hoje.\nAtualizando dados.`
+            bot.sendMessage(msg.chat.id, resp)
+            const { error } = await updateRowRanking(userId, date, total)
             if (!error) {
-                // resp = `${name}, ${horas} horas e ${minutos} minutos adicionados (Data: ${hojePtbr}).`
+                // resp = `${name}, ${horas} horas e ${minutos} minutos atualizados. (Data: ${hojePtbr}).`
                 // bot.sendMessage(msg.chat.id, resp)
                 bot.sendMessage(msg.chat.id, await getRankingDiario(date))
-            } else if (error.details.includes('already')) {
-                resp = `Usuário já registrou o dia de hoje.\nAtualizando dados.`
-                bot.sendMessage(msg.chat.id, resp)
-                const { error } = await updateRowRanking(userId, date, total)
-                if (!error) {
-                    // resp = `${name}, ${horas} horas e ${minutos} minutos atualizados. (Data: ${hojePtbr}).`
-                    // bot.sendMessage(msg.chat.id, resp)
-                    bot.sendMessage(msg.chat.id, await getRankingDiario(date))
-                }
             }
-        } else {
-            bot.sendMessage(
-                msg.chat.id,
-                'Padrão incorreto. Exemplos: /add 3h ou /add 3h30 ou /add 3:30'
-            )
         }
-    })
+    } else {
+        bot.sendMessage(
+            msg.chat.id,
+            'Padrão incorreto. Exemplos: /add 3h ou /add 3h30 ou /add 3:30'
+        )
+    }
 }
 
 const getDate = () => {
     const today = utcToZonedTime(new Date(), 'America/Sao_Paulo')
-    console.log(today)
     const minutes = getHours(today) * 3600 + getMinutes(today)
     const THRESHOLD = 9 * 3600
     if (minutes >= THRESHOLD) {
@@ -59,7 +47,3 @@ const getDate = () => {
         return subDays(today, 1)
     }
 }
-
-getDate()
-
-export default AddCommand
