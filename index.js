@@ -28,8 +28,7 @@ bot.on('/add', (msg) => {
 })
 
 const job = new CronJob(
-    // '1 9 * * *',
-    '58 18 * * *',
+    '1 9 * * *',
     async () => {
         await RankingsCommand()
     },
