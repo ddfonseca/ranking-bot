@@ -1,6 +1,6 @@
 # Ranking Telegram Bot
 
-Usuários adicionam seu score (em horas) com /add, exemplo: "/add 3h30", e automaticamente o ID do usuário é inserido no banco de dados postgresql ([supabase](https://supabase.io/)).
+Usuários adicionam seu score (em horas) com /add, exemplo: "/add 3h30", e automaticamente o ID do usuário é inserido no banco de dados postgresql ([supabase](https://supabase.io/)). Feito em NodeJS.
 
 É calculcado o ranking diário, acumulativo (durante a semana), semanal e mensal.
 
