@@ -17,17 +17,18 @@ export const AddCommand = async (msg) => {
         const userId = msg.from.id
         const date = getDate()
         const { data, error } = await addRowRanking(userId, date, total)
+        // console.log(data)
+        // console.log(error)
         let resp = ''
         if (!error) {
             bot.sendMessage(msg.chat.id, await displayTarget(userId))
             bot.sendMessage(msg.chat.id, await getRankingDiario(date))
         } else if (error.details.includes('already')) {
-            resp = `Usuário já registrou o dia de hoje.\nAtualizando dados.`
-            bot.sendMessage(msg.chat.id, resp)
             const { error } = await updateRowRanking(userId, date, total)
             if (!error) {
-                // resp = `${name}, ${horas} horas e ${minutos} minutos atualizados. (Data: ${hojePtbr}).`
+                // resp = `Usuário já registrou o dia de hoje.\nAtualizando dados.`
                 // bot.sendMessage(msg.chat.id, resp)
+                bot.sendMessage(msg.chat.id, await displayTarget(userId))
                 bot.sendMessage(msg.chat.id, await getRankingDiario(date))
             }
         }
