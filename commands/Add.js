@@ -5,6 +5,7 @@ import bot from '../utils/Bot'
 import { utcToZonedTime } from 'date-fns-tz'
 import { getHours, getMinutes } from 'date-fns'
 import subDays from 'date-fns/subDays'
+import { displayTarget } from './DisplayTarget'
 
 export const AddCommand = async (msg) => {
     const re = /(\d{1,2})[:h](\d{0,2})/
@@ -18,6 +19,7 @@ export const AddCommand = async (msg) => {
         const { data, error } = await addRowRanking(userId, date, total)
         let resp = ''
         if (!error) {
+            bot.sendMessage(msg.chat.id, await displayTarget(userId))
             bot.sendMessage(msg.chat.id, await getRankingDiario(date))
         } else if (error.details.includes('already')) {
             resp = `Usuário já registrou o dia de hoje.\nAtualizando dados.`

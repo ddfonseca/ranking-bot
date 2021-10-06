@@ -1,7 +1,7 @@
-import { getRankingAcumulativo } from './helperFunctions'
+// import { displayTarget } from '../commands/DisplayTarget'
 
-const init = async () => {
-    console.log(await getRankingAcumulativo())
-}
+// const init = async () => {
+//     displayTarget()
+// }
 
-init()
+// init()

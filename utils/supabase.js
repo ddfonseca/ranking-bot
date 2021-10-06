@@ -27,6 +27,44 @@ export const addRowRanking = async (userid, date, minutos) => {
     return { data, error }
 }
 
+export const addRowGoal = async (userid, meta) => {
+    const { data, error } = await supabase
+        .from('goal')
+        .insert([{ userid, meta }])
+    return { data, error }
+}
+
+export const updateRowGoal = async (userid, meta) => {
+    const { data, error } = await supabase
+        .from('goal')
+        .update([{ userid, meta }])
+        .match({ userid })
+    return { data, error }
+}
+
+export const getMinutesBetween = async (
+    firstDate = new Date(),
+    lastDate = new Date(),
+    userid
+) => {
+    const { data, error } = await supabase
+        .from('ranking')
+        .select('userid, players ( nome) ,minutos')
+        .gte('dia', formatDate(firstDate, 'yyyy-MM-dd'))
+        .lte('dia', formatDate(lastDate, 'yyyy-MM-dd'))
+        .eq('userid', userid)
+
+    return { data, error }
+}
+
+export const getDBMeta = async (userid) => {
+    const { data, error } = await supabase
+        .from('goal')
+        .select('meta')
+        .eq('userid', userid)
+    return data
+}
+
 export const updateRowRanking = async (userid, date, minutos) => {
     const dia = formatDate(date, 'yyyy-MM-dd')
     const { data, error } = await supabase

@@ -2,6 +2,7 @@ import express from 'express'
 import bot from './utils/Bot'
 import { AddCommand } from './commands/Add'
 import { RankingsCommand } from './commands/Rankings'
+import { ChallengeCommand } from './commands/Challenge'
 import { CronJob } from 'cron'
 
 const app = express()
@@ -27,8 +28,12 @@ bot.on('/add', (msg) => {
     AddCommand(msg)
 })
 
+bot.on('/desafio', (msg) => {
+    ChallengeCommand(msg)
+})
+
 const job = new CronJob(
-    '1 9 * * *',
+    '0 9 * * *',
     async () => {
         await RankingsCommand()
     },
