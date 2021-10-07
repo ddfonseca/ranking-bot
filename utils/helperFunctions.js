@@ -7,7 +7,7 @@ import {
     subDays,
     subMonths
 } from 'date-fns'
-import { getMinutesBetween, getRankingBetween } from './supabase'
+import { getMetas, getMinutesBetweenUser, getRankingBetween } from './supabase'
 import { format, utcToZonedTime } from 'date-fns-tz'
 
 export const createStringRank = (data) => {
@@ -29,6 +29,9 @@ export const createStringRank = (data) => {
     return result
 }
 
+/*
+    Sum minutes
+*/
 export const transformData = (data) => {
     const result = []
     data.reduce((acc, { players: { nome }, minutos }) => {
@@ -111,20 +114,95 @@ export const getTotalMinutes = async (userid) => {
     // console.log(weekday)
     if (weekday === 0) {
         const fday = subDays(today, 6)
-        const { data } = await getMinutesBetween(fday, today, userid)
+        const { data } = await getMinutesBetweenUser(fday, today, userid)
         total = data.reduce((acc, { minutos }) => acc + minutos, 0)
     } else if (weekday === 1) {
-        const { data } = await getMinutesBetween(today, today, userid)
+        const { data } = await getMinutesBetweenUser(today, today, userid)
         total = data.reduce((acc, { minutos }) => acc + minutos, 0)
     } else {
         const fday = subDays(today, weekday - 1)
-        const { data } = await getMinutesBetween(fday, today, userid)
+        const { data } = await getMinutesBetweenUser(fday, today, userid)
         total = data.reduce((acc, { minutos }) => acc + minutos, 0)
     }
 
     return total
 }
 
-export const getTimeAndReturnDay = () => {
-    const today = new Date()
+export const getMetasAcumulativo = async () => {
+    let result
+    const today = utcToZonedTime(new Date(), 'America/Sao_Paulo')
+    const weekday = getDay(today)
+    // console.log(weekday)
+    if (weekday === 0) {
+        const fdate = subDays(today, 6)
+        result = createStringMetas(fdate, today)
+    } else if (weekday === 1) {
+        result = createStringMetas(today, today)
+    } else {
+        const fdate = subDays(today, weekday - 1)
+        result = createStringMetas(fdate, today)
+    }
+
+    return result
+}
+
+export const createStringMetas = async (fdate, sdate) => {
+    const r1 = await getMetasDB(fdate, sdate)
+    let header = 'Ranking de Metas'
+    const firstDayFormatted = formatDate(fdate, 'dd/MM/yyyy')
+    const lastDayFormatted = formatDate(sdate, 'dd/MM/yyyy')
+    header += `\nEntre as datas ${firstDayFormatted} e ${lastDayFormatted} 🏆\n\n`
+
+    const r2 = r1.reduce((acc, { nome, minutos, meta, percentage }, idx) => {
+        const hour = (minutos / 60).toFixed(2)
+        const metaHour = meta / 60
+        acc += `${nome} - ${(percentage * 100).toFixed(
+            2
+        )}% (${hour}h/${metaHour}h)`
+        if (idx === 0) acc += ' 🥇\n'
+        else if (idx === 1) acc += ' 🥈\n'
+        else if (idx === 2) acc += ' 🥉\n'
+        else acc += '\n'
+
+        return acc
+    }, '')
+    return header + r2
+}
+
+export const getMetasDB = async (fdate, sdate) => {
+    const { data } = await getRankingBetween(fdate, sdate)
+    const metas = await getMetas()
+    const result = metas
+        .map(({ userid: id, meta }) => {
+            return data
+                .map(({ userid, minutos, players: { nome } }) => ({
+                    userid,
+                    nome,
+                    minutos
+                }))
+                .filter(({ userid }) => userid === id)
+                .reduce(
+                    (acc, { userid, nome, minutos }) => {
+                        return {
+                            userid,
+                            nome,
+                            minutos: acc.minutos + minutos,
+                            meta
+                        }
+                    },
+                    { minutos: 0 }
+                )
+        })
+        .map(({ userid, nome, minutos, meta }) => {
+            return {
+                userid,
+                nome,
+                minutos,
+                meta,
+                percentage: minutos / meta
+            }
+        })
+        .sort((a, b) => (a.percentage < b.percentage && 1) || -1)
+
+    return result
 }

@@ -1,6 +1,7 @@
 import bot from '../utils/Bot'
 import dotenv from 'dotenv'
 import {
+    getMetasAcumulativo,
     getRankingAcumulativo,
     getRankingMensal,
     getRankingSemanal
@@ -26,7 +27,9 @@ export const RankingsCommand = async (msg) => {
     if (result) {
         bot.sendMessage(sendTo, result)
     }
-
-    // console.log(sendTo)
-    // console.log(result)
+    result = await getMetasAcumulativo()
+    // console.log(`acumulativo: ${result}\n`)
+    if (result) {
+        bot.sendMessage(sendTo, result)
+    }
 }

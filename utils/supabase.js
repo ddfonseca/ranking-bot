@@ -42,7 +42,7 @@ export const updateRowGoal = async (userid, meta) => {
     return { data, error }
 }
 
-export const getMinutesBetween = async (
+export const getMinutesBetweenUser = async (
     firstDate = new Date(),
     lastDate = new Date(),
     userid
@@ -62,6 +62,11 @@ export const getDBMeta = async (userid) => {
         .from('goal')
         .select('meta')
         .eq('userid', userid)
+    return data
+}
+
+export const getMetas = async () => {
+    const { data, error } = await supabase.from('goal').select('userid, meta')
     return data
 }
 
@@ -89,14 +94,12 @@ export const getRankingBetween = async (
     return { data, error }
 }
 
-const init = async () => {
-    // console.log(await getRankingDiario(new Date()))
-    // const { data, error } = await getRankingBetween('2021-08-24', '2021-08-26')
-    // let result
-    // if (!error) {
-    //     result = transFormData(data)
-    // }
-    // console.log(result)
+export const rpcTest = async () => {
+    return await supabase.rpc('getMinutosBetween', {
+        params: {
+            fdate: '2021-10-01',
+            sdate: '2021-10-07'
+        }
+    })
 }
-
-// init()
+// await supabase.rpc('echo_city', params: { 'name': 'The Shire' })  .execute();

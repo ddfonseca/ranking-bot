@@ -32,7 +32,7 @@ const percentageToString = (total, meta) => {
     const bar =
         '|' +
         fill.repeat(filledLength / scale) +
-        '.'.repeat((length - filledLength) / scale) +
+        '..'.repeat((length - filledLength) / scale) +
         '| ' +
         filledLength +
         `% Completo ${totalHour}h / ${metaHour}h`

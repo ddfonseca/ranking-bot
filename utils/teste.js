@@ -1,7 +1,16 @@
-// import { displayTarget } from '../commands/DisplayTarget'
+import { displayTarget } from '../commands/DisplayTarget'
+import {
+    formatDate,
+    getMetasAcumulativo,
+    transformData
+} from './helperFunctions'
+import { getMetas, getRankingBetween, rpcTest } from './supabase'
 
-// const init = async () => {
-//     displayTarget()
-// }
+const init = async () => {
+    console.log(await getMetasAcumulativo())
 
-// init()
+    // const meta = getDBMeta()
+    // displayTarget()
+}
+
+init()
