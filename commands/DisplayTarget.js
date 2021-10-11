@@ -21,20 +21,25 @@ const getMeta = async (userid) => {
     }
 }
 
-const percentageToString = (total, meta) => {
+export const percentageToString = (total, meta, scale = 4) => {
     const percentage = total / meta
+    console.log(percentage)
     const metaHour = (meta / 60).toString()
     const totalHour = (total / 60).toFixed(2)
     const fill = '█'
-    const scale = 4
     const length = 100
-    const filledLength = Math.round(percentage * 100)
+    let filledLength
+    if (total > meta) {
+        filledLength = 100
+    } else {
+        filledLength = Math.round(percentage * 100)
+    }
     const bar =
         '|' +
         fill.repeat(filledLength / scale) +
-        '..'.repeat((length - filledLength) / scale) +
+        '.'.repeat((length - filledLength) / scale) +
         '| ' +
-        filledLength +
-        `% Completo ${totalHour}h / ${metaHour}h`
+        Math.round(percentage * 100) +
+        `pts - ${totalHour}h de ${metaHour}h`
     return bar
 }

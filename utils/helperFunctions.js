@@ -9,6 +9,7 @@ import {
 } from 'date-fns'
 import { getMetas, getMinutesBetweenUser, getRankingBetween } from './supabase'
 import { format, utcToZonedTime } from 'date-fns-tz'
+import { percentageToString } from '../commands/DisplayTarget'
 
 export const createStringRank = (data) => {
     const result = data.reduce((acc, { minutos, players: { nome } }, idx) => {
@@ -147,6 +148,7 @@ export const getMetasAcumulativo = async () => {
 }
 
 export const createStringMetas = async (fdate, sdate) => {
+    const scale = 10
     const r1 = await getMetasDB(fdate, sdate)
     let header = 'Ranking de Metas'
     const firstDayFormatted = formatDate(fdate, 'dd/MM/yyyy')
@@ -154,15 +156,23 @@ export const createStringMetas = async (fdate, sdate) => {
     header += `\nEntre as datas ${firstDayFormatted} e ${lastDayFormatted} 🏆\n\n`
 
     const r2 = r1.reduce((acc, { nome, minutos, meta, percentage }, idx) => {
-        const hour = (minutos / 60).toFixed(2)
-        const metaHour = meta / 60
-        acc += `${nome} - ${(percentage * 100).toFixed(
-            2
-        )}% (${hour}h/${metaHour}h)`
-        if (idx === 0) acc += ' 🥇\n'
-        else if (idx === 1) acc += ' 🥈\n'
-        else if (idx === 2) acc += ' 🥉\n'
-        else acc += '\n'
+        // const hour = (minutos / 60).toFixed(2)
+        // const metaHour = meta / 60
+        // const bar = percentageToString(minutos, meta, scale)
+        const pts = Math.round(percentage * 100)
+
+        if (percentage >= 1.1) {
+            acc += `${nome} - ${pts}pts 🔥\n`
+        } else if (percentage >= 1 && percentage < 1.1) {
+            acc += `${nome} - ${pts}pts 🎖️\n`
+        } else if (percentage >= 0.9 && percentage < 1) {
+            acc += `${nome} ️- ${pts}pts 😅\n`
+        } else {
+            acc += `${nome} ️- ${pts}\n`
+        }
+        // acc += `${nome} - ${(percentage * 100).toFixed(
+        //     2
+        // )}% (${hour}h/${metaHour}h)`
 
         return acc
     }, '')

@@ -8,7 +8,7 @@ import subDays from 'date-fns/subDays'
 import { displayTarget } from './DisplayTarget'
 
 export const AddCommand = async (msg) => {
-    const re = /(\d{1,2})[:h](\d{0,2})/
+    const re = /(\d{1,2})[:h]?(\d{0,2})/
     const match = re.exec(msg.text) || false
     if (match) {
         const horas = match[1] || 0
